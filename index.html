@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('https://images.pexels.com/photos/965121/pexels-photo-965121.jpeg?cs=srgb&dl=pexels-jessbaileydesign-965121.jpg&fm=jpg'); /* Replace with your background image URL */
+            background-image: url('https://example.com/your-background-image.jpg'); /* Replace with your background image URL */
             background-size: cover;
             color: white;
             text-align: center;
@@ -17,6 +17,7 @@
         input { margin: 10px; padding: 10px; }
         #result { margin-top: 20px; }
         #game-over { display: none; }
+        #timer { font-size: 1.5em; }
     </style>
 </head>
 <body>
@@ -24,24 +25,35 @@
     <div id="game-container">
         <label for="name">Enter your name: </label>
         <input type="text" id="name" />
+        <div id="difficulty-container">
+            <label for="difficulty">Select Difficulty: </label>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
         <button class="button" onclick="startGame()">Start Game</button>
     </div>
     <div id="questions" style="display:none;">
         <h2 id="question"></h2>
         <input type="number" id="answer" />
         <button class="button" onclick="checkAnswer()">Submit</button>
+        <div id="timer">Time left: <span id="time">10</span> seconds</div>
     </div>
     <div id="result" style="display:none;"></div>
     <div id="game-over">
         <h2>Game Over!</h2>
-        <p>You exceeded the wrong answer limit.</p>
+        <p id="summary"></p>
         <button class="button" onclick="restartGame()">Restart Game</button>
     </div>
 
     <script>
         let userName, score = 0, currentQuestion, correctAnswer;
         let wrongAttempts = 0;
-        const maxWrongAttempts = 5;
+        const maxWrongAttempts = 3;
+        let timer;
+        const timeLimit = 10; // seconds
 
         function startGame() {
             userName = document.getElementById('name').value;
@@ -51,15 +63,54 @@
             document.getElementById('questions').style.display = 'block';
             document.getElementById('result').style.display = 'none';
             document.getElementById('game-over').style.display = 'none';
+            document.getElementById('time').innerText = timeLimit;
             nextQuestion();
         }
 
         function nextQuestion() {
-            const num1 = Math.floor(Math.random() * 20) + 1;
-            const num2 = Math.floor(Math.random() * 20) + 1;
-            correctAnswer = num1 + num2; // Change this for different levels
+            const difficulty = document.getElementById('difficulty').value;
+            let num1, num2;
+            
+            switch(difficulty) {
+                case 'easy':
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    break;
+                case 'medium':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    break;
+                case 'hard':
+                    num1 = Math.floor(Math.random() * 50) + 1;
+                    num2 = Math.floor(Math.random() * 50) + 1;
+                    break;
+            }
+
+            correctAnswer = num1 + num2; // You can randomize operations here
             currentQuestion = `${num1} + ${num2} = ?`;
             document.getElementById('question').innerText = currentQuestion;
+
+            // Reset timer
+            clearInterval(timer);
+            startTimer();
+        }
+
+        function startTimer() {
+            let timeRemaining = timeLimit;
+            document.getElementById('time').innerText = timeRemaining;
+
+            timer = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('time').innerText = timeRemaining;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    wrongAttempts++;
+                    document.getElementById('result').innerText = `⏰ Time's up! The correct answer was ${correctAnswer}.`;
+                    document.getElementById('result').style.display = 'block';
+                    checkGameOver();
+                }
+            }, 1000);
         }
 
         function checkAnswer() {
@@ -71,23 +122,27 @@
                 resultMessage = '🎉 Correct!';
             } else {
                 wrongAttempts++;
-                resultMessage = `😢 Wrong! The correct answer is ${correctAnswer}. You have ${maxWrongAttempts - wrongAttempts} wrong attempts left.`;
+                resultMessage = `😢 Wrong! The correct answer is ${correctAnswer}.`;
             }
 
             document.getElementById('result').innerText = resultMessage + ` Current Score: ${score}`;
-            document.getElementById('result').style.display = 'block'; // Show results
-            
-            if (wrongAttempts >= maxWrongAttempts) {
-                gameOver();
-            } else {
-                nextQuestion();
-            }
+            document.getElementById('result').style.display = 'block';
+            checkGameOver();
 
+            nextQuestion();
             document.getElementById('answer').value = ''; // Clear input
         }
 
+        function checkGameOver() {
+            if (wrongAttempts >= maxWrongAttempts) {
+                gameOver();
+            }
+        }
+
         function gameOver() {
+            clearInterval(timer);
             document.getElementById('questions').style.display = 'none';
+            document.getElementById('summary').innerText = `You scored ${score} points with ${wrongAttempts} wrong attempts.`;
             document.getElementById('game-over').style.display = 'block';
         }
 
