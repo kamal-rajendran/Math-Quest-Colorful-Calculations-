@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quest: Colorful Calculations</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f8ff; text-align: center; }
+        h1 { color: #ff6347; }
+        .button { margin: 10px; padding: 10px; background-color: #32cd32; color: white; border: none; cursor: pointer; }
+        input { margin: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Math Quest: Colorful Calculations!</h1>
+    <div id="game-container">
+        <label for="name">Enter your name: </label>
+        <input type="text" id="name" />
+        <button class="button" onclick="startGame()">Start Game</button>
+    </div>
+    <div id="questions" style="display:none;">
+        <h2 id="question"></h2>
+        <input type="number" id="answer" />
+        <button class="button" onclick="checkAnswer()">Submit</button>
+    </div>
+    <div id="result" style="display:none;"></div>
+
+    <script>
+        let userName, score = 0, currentQuestion, correctAnswer;
+
+        function startGame() {
+            userName = document.getElementById('name').value;
+            score = 0;
+            document.getElementById('game-container').style.display = 'none';
+            document.getElementById('questions').style.display = 'block';
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            const num1 = Math.floor(Math.random() * 20) + 1;
+            const num2 = Math.floor(Math.random() * 20) + 1;
+            correctAnswer = num1 + num2; // Change this for different levels
+            currentQuestion = `${num1} + ${num2} = ?`;
+            document.getElementById('question').innerText = currentQuestion;
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            if (userAnswer === correctAnswer) {
+                score++;
+                alert('🎉 Correct!');
+            } else {
+                alert(`😢 Wrong! The correct answer is ${correctAnswer}.`);
+            }
+            nextQuestion();
+            document.getElementById('answer').value = '';
+        }
+    </script>
+</body>
+</html>
