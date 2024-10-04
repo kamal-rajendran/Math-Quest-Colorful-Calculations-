@@ -9,6 +9,7 @@
         h1 { color: #ff6347; }
         .button { margin: 10px; padding: 10px; background-color: #32cd32; color: white; border: none; cursor: pointer; }
         input { margin: 10px; padding: 10px; }
+        #result { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -33,6 +34,7 @@
             score = 0;
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('questions').style.display = 'block';
+            document.getElementById('result').style.display = 'none'; // Hide results initially
             nextQuestion();
         }
 
@@ -46,14 +48,20 @@
 
         function checkAnswer() {
             const userAnswer = parseInt(document.getElementById('answer').value);
+            let resultMessage = '';
+
             if (userAnswer === correctAnswer) {
                 score++;
-                alert('🎉 Correct!');
+                resultMessage = '🎉 Correct!';
             } else {
-                alert(`😢 Wrong! The correct answer is ${correctAnswer}.`);
+                resultMessage = `😢 Wrong! The correct answer is ${correctAnswer}.`;
             }
+
+            // Update result section
+            document.getElementById('result').innerText = resultMessage + ` Current Score: ${score}`;
+            document.getElementById('result').style.display = 'block'; // Show results
             nextQuestion();
-            document.getElementById('answer').value = '';
+            document.getElementById('answer').value = ''; // Clear input
         }
     </script>
 </body>
