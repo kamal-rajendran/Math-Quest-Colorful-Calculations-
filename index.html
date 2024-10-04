@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Quest: Colorful Calculations</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f8ff; text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://example.com/your-background-image.jpg'); /* Replace with your background image URL */
+            background-size: cover;
+            color: white;
+            text-align: center;
+        }
         h1 { color: #ff6347; }
         .button { margin: 10px; padding: 10px; background-color: #32cd32; color: white; border: none; cursor: pointer; }
         input { margin: 10px; padding: 10px; }
         #result { margin-top: 20px; }
+        #game-over { display: none; }
     </style>
 </head>
 <body>
@@ -25,16 +32,25 @@
         <button class="button" onclick="checkAnswer()">Submit</button>
     </div>
     <div id="result" style="display:none;"></div>
+    <div id="game-over">
+        <h2>Game Over!</h2>
+        <p>You exceeded the wrong answer limit.</p>
+        <button class="button" onclick="restartGame()">Restart Game</button>
+    </div>
 
     <script>
         let userName, score = 0, currentQuestion, correctAnswer;
+        let wrongAttempts = 0;
+        const maxWrongAttempts = 3;
 
         function startGame() {
             userName = document.getElementById('name').value;
             score = 0;
+            wrongAttempts = 0;
             document.getElementById('game-container').style.display = 'none';
             document.getElementById('questions').style.display = 'block';
-            document.getElementById('result').style.display = 'none'; // Hide results initially
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('game-over').style.display = 'none';
             nextQuestion();
         }
 
@@ -54,14 +70,30 @@
                 score++;
                 resultMessage = '🎉 Correct!';
             } else {
-                resultMessage = `😢 Wrong! The correct answer is ${correctAnswer}.`;
+                wrongAttempts++;
+                resultMessage = `😢 Wrong! The correct answer is ${correctAnswer}. You have ${maxWrongAttempts - wrongAttempts} wrong attempts left.`;
             }
 
-            // Update result section
             document.getElementById('result').innerText = resultMessage + ` Current Score: ${score}`;
             document.getElementById('result').style.display = 'block'; // Show results
-            nextQuestion();
+            
+            if (wrongAttempts >= maxWrongAttempts) {
+                gameOver();
+            } else {
+                nextQuestion();
+            }
+
             document.getElementById('answer').value = ''; // Clear input
+        }
+
+        function gameOver() {
+            document.getElementById('questions').style.display = 'none';
+            document.getElementById('game-over').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('game-over').style.display = 'none';
+            startGame();
         }
     </script>
 </body>
